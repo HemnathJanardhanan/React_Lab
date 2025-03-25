@@ -37,7 +37,17 @@ function HomePage(){
     let [amount,setAmount]=useState(0);
     const addItem=(id)=>{
         let food=Menu.find((item)=>{return item.id===id});
-        setOrder((prev)=>[...prev,food]);
+        let inOrder=order.findIndex((item)=>(item.id===id))
+        if(inOrder===-1){
+            food={...food,qty:1}
+            setOrder((prev)=>[...prev,food]);
+        }else{
+            setOrder((prev)=>{
+                return prev.map((item,index)=>{
+                    return index===inOrder ? {...item,price:food.price*(item.qty+1),qty:item.qty+1}:item;
+                })
+            });
+        }
     }
     const calculateOrder=()=>{
         let total=0;
@@ -73,7 +83,7 @@ function HomePage(){
                     <div className='flex flex-col mt-4'>
                         {order.map((item)=>{
                             return <div className='flex flex-col'>
-                                <OrderCard id={item.id} fname={item.name} price={item.price}/>
+                                <OrderCard id={item.id} fname={item.name} price={item.price} qty={item.qty}/>
                             </div>
                         })}
 
