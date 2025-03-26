@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1,
+    "deckName": "JavaScript Basics",
+    "flashcards": [
+      { "fid": 101, "question": "What is a closure?", "answer": "A closure is a function that retains access to its lexical scope, even when the function is executed outside that scope." },
+      { "fid": 102, "question": "What is the difference between `let`, `const`, and `var`?", "answer": "`var` is function-scoped, while `let` and `const` are block-scoped. `const` also prevents reassignment." },
+      { "fid": 103, "question": "What does `typeof null` return?", "answer": "`object` (this is a well-known JavaScript bug)." },
+      { "fid": 104, "question": "What is event delegation?", "answer": "A technique where a parent element handles events for its child elements using event bubbling." },
+      { "fid": 105, "question": "What is the difference between `==` and `===` in JavaScript?", "answer": "`==` checks for value equality with type coercion, while `===` checks for both value and type equality." },
+      { "fid": 106, "question": "Explain the concept of promises in JavaScript.", "answer": "Promises represent a value that might be available now, in the future, or never. They have states: pending, fulfilled, and rejected." },
+      { "fid": 107, "question": "What is the purpose of the `map()` function in JavaScript?", "answer": "`map()` creates a new array by applying a function to each element of an existing array." }
+    ]
+  },
+  {
+    "id": 2,
+    "deckName": "React Fundamentals",
+    "flashcards": [
+      { "fid": 201, "question": "What is JSX?", "answer": "JSX is a syntax extension for JavaScript that looks similar to HTML and is used in React to describe UI structure." },
+      { "fid": 202, "question": "What are React hooks?", "answer": "Hooks are functions that let you use state and lifecycle features in functional components, like `useState` and `useEffect`." },
+      { "fid": 203, "question": "What is the virtual DOM?", "answer": "A lightweight copy of the real DOM that React uses to improve performance by updating only changed elements." },
+      { "fid": 204, "question": "What is the use of `useState` in React?", "answer": "`useState` is a hook that allows functional components to have state." },
+      { "fid": 205, "question": "What is React Router?", "answer": "React Router is a library that enables navigation and routing in React applications." },
+      { "fid": 206, "question": "What are props in React?", "answer": "Props (short for properties) are used to pass data from parent to child components in React." },
+      { "fid": 207, "question": "What is the difference between controlled and uncontrolled components?", "answer": "Controlled components have their state managed by React, while uncontrolled components store state in the DOM." }
+    ]
+  },
+  {
+    "id": 3,
+    "deckName": "Data Structures & Algorithms",
+    "flashcards": [
+      { "fid": 301, "question": "What is the time complexity of binary search?", "answer": "O(log n)" },
+      { "fid": 302, "question": "What data structure is used in a queue?", "answer": "A queue follows FIFO (First In, First Out) and can be implemented using arrays or linked lists." },
+      { "fid": 303, "question": "What is a hash table?", "answer": "A data structure that stores key-value pairs using a hash function for quick lookups." },
+      { "fid": 304, "question": "What is a linked list?", "answer": "A linked list is a data structure where each element (node) contains a value and a pointer to the next node." },
+      { "fid": 305, "question": "What is the difference between BFS and DFS?", "answer": "BFS (Breadth-First Search) explores level by level, while DFS (Depth-First Search) explores as deep as possible before backtracking." },
+      { "fid": 306, "question": "What is a stack and how does it work?", "answer": "A stack follows LIFO (Last In, First Out) and can be implemented using arrays or linked lists." },
+      { "fid": 307, "question": "What is dynamic programming?", "answer": "Dynamic programming is an optimization technique used to solve problems by breaking them down into overlapping subproblems." }
+    ]
+  }
+]
