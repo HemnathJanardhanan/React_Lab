@@ -9,7 +9,7 @@ function PlayCard({ question, answer,id }) {
   return (
     <Card
       className="w-full h-full backdrop-blur-xl shadow-lg bg-blue-200 flex flex-col items-center justify-center rounded-xl hover:shadow-2xl transition-shadow duration-300 cursor-pointer"
-      onClick={() => setIsVisible(!isVisible)} // Toggle visibility
+      onClick={() => setIsVisible(!isVisible)}
     >
       <CardContent className="h-full w-full flex items-center justify-center text-center">
         <h3 className="text-3xl">{isVisible ? answer : question}</h3>
