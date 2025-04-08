@@ -1,16 +1,15 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import {Input} from '@/components/ui/input'
 import {Button} from '@/components/ui/button'
 import { Checkbox } from "@/components/ui/checkbox"
-
+import axios from 'axios'
 function ListCard({item,oncheck}){
   
   return(
-    <div className='w-3/4 flex flex-row justify-between items-center text-center p-5'>
-      
-      <Checkbox onCheckedChange={()=>oncheck(item.id)} checked={item.isChecked}/>
-      <h3 className='text-white'>{item.itemName}</h3>
-      <h3 className='text-white'>X {item.qty}</h3>
+    <div className='w-3/4 flex flex-row justify-between items-center text-center p-5'>      
+      <Checkbox onCheckedChange={()=>oncheck(item._id)} checked={item.isChecked}/>
+      <h3 className='text-white'>{item.name}</h3>
+      <h3 className='text-white'>X {item.quantity}</h3>
       
     </div>
   )
@@ -22,15 +21,55 @@ function HomePage() {
   const [itemName,setItemName]=useState('');
   const [qty,setQty]=useState(0);
 
+  const fetchEvents=async()=>{
+    try{
+      let response=await axios.get('http://localhost:3000/')
+      setList(response.data)
+    }
+    catch(error){
+      console.log("Error : ",error.message);
+    }
+  }
+  useEffect(()=>{
+    
+    fetchEvents();
+  },[])
 
-  const addItemHandler=()=>{
-    setList((prev)=>[...prev,{id:Math.floor(Math.random()*100),itemName,qty,isChecked:false}]);
-    setItemName('');
-    setQty(0);
+  useEffect(()=>{
+    console.log(list)
+  },[list])
+
+  const addItemHandler=async()=>{
+    const obj={name:itemName,quantity:qty,isChecked:false}
+    try{
+      let response=await axios.post('http://localhost:3000/',obj,{
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      fetchEvents()
+      console.log("Post item",response.data)
+    }catch(error){
+      console.log("Error : ",error.message);
+    }
+  
+  
+   
+  
+  
   }
 
-  const handleChecked=(id)=>{
-    setList((prev)=>{return prev.map((item)=>{return item.id===id?{...item,isChecked:true}:item})})
+  const handleChecked=async(id)=>{
+    const obj={isChecked:true}
+    try{
+      let response= await axios.put(`http://localhost:3000/${id}`,obj,{headers:{'Content-Type':'application/json'}})
+      console.log("Handle Checked : ",response.data);
+      fetchEvents()
+    }catch(error){
+      console.log("Error : ",error.message)
+    }
+    
+   
    
   } 
 
