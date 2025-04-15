@@ -8,7 +8,7 @@ import {
   } from "@/components/ui/card"
   
 
-
+import axios from 'axios';
 
 
 
@@ -52,20 +52,18 @@ function DeckCard(props){
 function HomePage() {
     let [decks,setDecks]=useState([]);
     
-        useEffect(()=>{
-            const storedDecks=localStorage.getItem('decks');
-            if(storedDecks){
-                setDecks(JSON.parse(storedDecks))
-            }else {
-                fetch("/decks.json")
-                  .then((res) => res.json())
-                  .then((data) => {
-                    setDecks(data);
-                    localStorage.setItem("decks", JSON.stringify(data)); // Save initially
-                  })
-                  .catch((error) => console.error("Error loading decks:", error));
-              }
-        },[])
+    useEffect(() => {
+        const fetchDecks = async () => {
+          try {
+            const response = await axios.get('http://localhost:3000/decks');
+            setDecks(response.data);
+          } catch (err) {
+            console.error('Failed to load decks:', err);
+          }
+        };
+    
+        fetchDecks();
+      }, []);
     
     
   return (
@@ -78,7 +76,7 @@ function HomePage() {
             decks.map((deck)=>{
                 return(
                     <div className='flex flex-row justify-center'>
-                        <DeckCard id={deck.id} deckname={deck.deckName}/>
+                        <DeckCard id={deck._id} deckname={deck.deckName}/>
                     </div>
                 );
             })

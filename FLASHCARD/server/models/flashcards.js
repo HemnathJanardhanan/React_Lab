@@ -7,6 +7,6 @@ const FlashCardSchema=new mongoose.Schema({
     answer:String
 })
 
-const FlashCard=mongoose.model("FlashCards",FlashCardSchema);
+const FlashCard=mongoose.model("FlashCard",FlashCardSchema);
 
 export default FlashCard;

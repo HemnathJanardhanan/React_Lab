@@ -6,6 +6,6 @@ const deckSchema=new mongoose.Schema({
     flashCards:[{type:mongoose.Schema.Types.ObjectId,ref:'FlashCard'}]
 })
 
-const Deck=mongoose.model("Decks",deckSchema);
+const Deck=mongoose.model("Deck",deckSchema);
 
 export default Deck;

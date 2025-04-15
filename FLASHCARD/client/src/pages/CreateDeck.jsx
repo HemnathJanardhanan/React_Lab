@@ -1,9 +1,8 @@
-import React, { useEffect ,useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -11,131 +10,159 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import FlashCard from '../components/custom/FlashCard'
-
-
-
+import axios from 'axios'
 
 function CreateDeck() {
-
-    let [deckId,setDeckId]=useState(0);
-    let [deckName,setdeckName]=useState('');
-    let [newdeck,setNewDeck]=useState({id:deckId,deckName,flashcards:[]});
-    let [decks,setDecks]=useState([]);
-    let [isCreated,setIsCreated]=useState(false);
-    
-    let [question, setQuestion]=useState('');
-    let [answer, setAnswer]=useState('');
-    
-    
-
-
-
-    useEffect(()=>{
-        
-        const storedDecks=localStorage.getItem('decks');
-        if(storedDecks){
-            setDecks(JSON.parse(storedDecks))
-        }else {
-            fetch("/decks.json")
-              .then((res) => res.json())
-              .then((data) => {
-                setDecks(data);
-                localStorage.setItem("decks", JSON.stringify(data)); // Save initially
-              })
-              .catch((error) => console.error("Error loading decks:", error));
-          }
-    },[])
-
-
-    const generateId=()=>(Math.floor(Math.random()*10000))
-
-    const handleCreateFlashCard=()=>{
-        let flashCard={
-            fid:generateId(),
-            question,
-            answer
+    const [decks, setDecks] = useState([]);
+    const [deckForm, setDeckForm] = useState({ name: '' });
+    const [newDeck, setNewDeck] = useState(null);
+    const [flashcardForm, setFlashcardForm] = useState({ question: '', answer: '' });
+  
+    // Load all decks on component mount
+    useEffect(() => {
+      const fetchDecks = async () => {
+        try {
+          const response = await axios.get('http://localhost:3000/decks');
+          setDecks(response.data);
+        } catch (err) {
+          console.error('Failed to load decks:', err);
+        }
+      };
+  
+      fetchDecks();
+    }, []);
+  
+    // Create a new deck
+    const handleCreateDeck = async () => {
+      if (!deckForm.name.trim()) return;
+  
+      try {
+        const res = await axios.post('http://localhost:3000/deck', {
+          deckName: deckForm.name.trim(),
+        });
+  
+        const createdDeck = { ...res.data, flashcards: [] };
+        setNewDeck(createdDeck);
+        setDecks(prev => [...prev, createdDeck]);
+        setDeckForm({ name: '' });
+      } catch (err) {
+        console.error('Error creating deck:', err);
+      }
+    };
+  
+    // Add a flashcard to the current deck
+    const handleCreateFlashCard = async () => {
+      const { question, answer } = flashcardForm;
+      if (!question.trim() || !answer.trim() || !newDeck?._id) return;
+  
+      try {
+        const res = await axios.post(`http://localhost:3000/deck/${newDeck._id}/card`, {
+          question: question.trim(),
+          answer: answer.trim(),
+        });
+  
+        const addedCard = res.data.card;
+  
+        // Update local newDeck and decks state
+        const updatedDeck = {
+          ...newDeck,
+          flashcards: [...newDeck.flashcards, addedCard],
         };
-        let updatedDeck={...newdeck,flashcards:[...newdeck.flashcards,flashCard]}
         setNewDeck(updatedDeck);
-        let updatedDecks = decks.map(deck => 
-            deck.id === deckId ? { ...deck, flashcards: [...deck.flashcards, flashCard] } : deck
+  
+        setDecks(prev =>
+          prev.map(deck =>
+            deck._id === newDeck._id
+              ? { ...deck, flashcards: [...(deck.flashcards || []), addedCard] }
+              : deck
+          )
         );
-        setDecks(updatedDecks);
+  
+        setFlashcardForm({ question: '', answer: '' });
+      } catch (err) {
+        console.error('Error adding flashcard:', err);
+      }
+    };
 
-        localStorage.setItem("decks",JSON.stringify(updatedDecks));
-        setAnswer("");
-        setQuestion("");
-
-    }
-    const handleCreateDeck=()=>{
-        let deck={
-            id:generateId(),
-            deckName,
-            flashcards:[]
-        };
-        setNewDeck(deck);
-        setDeckId(deck.id);
-        let newDecks=[...decks,deck];
-        setDecks(newDecks);
-        localStorage.setItem("decks",JSON.stringify(newDecks));
-        console.log('deck created Successfully');
-        setIsCreated(true);
-    }
-    if(isCreated===false){
-        return (
-            <div className='flex flex-row justify-center m-20'>                
-                <Card className='bg-gray-200 shadow-2xl w-1/3'>                    
-                    <CardHeader className='text-2xl font-extrabold font-nunito'>
-                        <CardTitle>Create New Deck</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className='flex flex-col justify-center items-center'>
-                            <Input value={deckName} placeholder="Deck Name" onChange={(e)=>(setdeckName(e.target.value))}/>
-                        </div>
-                    </CardContent>
-                    <CardFooter>
-                        <Button className="text-lg px-6 py-6" onClick={()=>{handleCreateDeck()}}>Create</Button>
-                    </CardFooter>
-                </Card>
+    return (
+        <div className="m-20 flex flex-col items-center">
+          {!newDeck ? (
+            <div className="flex flex-row justify-center w-full">
+              <Card className="bg-gray-200 shadow-2xl w-1/3">
+                <CardHeader className="text-2xl font-extrabold font-nunito">
+                  <CardTitle>Create New Deck</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col justify-center items-center">
+                    <Input
+                      value={deckForm.name}
+                      placeholder="Deck Name"
+                      onChange={(e) =>
+                        setDeckForm((prev) => ({ ...prev, name: e.target.value }))
+                      }
+                    />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button className="text-lg px-6 py-6" onClick={handleCreateDeck}>
+                    Create
+                  </Button>
+                </CardFooter>
+              </Card>
             </div>
-        )
-    }else{
-        return(
-            <div className='flex flex-col items-center m-20'>
-                
-                <Card className='w-1/3 h-2/3'>
-                    <CardHeader className="flex flex-row justify-center items-center text-center text-4xl">
-                        <CardTitle>Add FlashCard</CardTitle>
-                    </CardHeader>
-                    <CardContent className='flex flex-col space-y-5'>
-                        
-                            <Input value={question} placeholder="Question" onChange={(e)=>(setQuestion(e.target.value))}/>
-                            <Textarea value={answer} placeholder="Answer" onChange={(e)=>(setAnswer(e.target.value))}/>
-                        
-                    </CardContent>
-                    <CardFooter className='flex flex-row justify-center'>
-                        
-                        <Button className='text-xl' onClick={()=>{handleCreateFlashCard()}}>Add</Button>
-                        
-                    </CardFooter>
-                </Card>
-
-                <div className='m-10 flex flex-col items-center' >
-                    <h2>FlashCards</h2>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-                        {
-                            newdeck.flashcards.map((flashcard)=>{
-                                
-                                return(
-                                    <><FlashCard fid={flashcard.fid} question={flashcard.question} answer={flashcard.answer}/></>
-                                )
-                            })
-                        }
-                    </div>
+          ) : (
+            <>
+              <Card className="w-1/3 h-2/3">
+                <CardHeader className="flex flex-row justify-center items-center text-center text-4xl">
+                  <CardTitle>Add FlashCard</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col space-y-5">
+                  <Input
+                    value={flashcardForm.question}
+                    placeholder="Question"
+                    onChange={(e) =>
+                      setFlashcardForm((prev) => ({
+                        ...prev,
+                        question: e.target.value,
+                      }))
+                    }
+                  />
+                  <Textarea
+                    value={flashcardForm.answer}
+                    placeholder="Answer"
+                    onChange={(e) =>
+                      setFlashcardForm((prev) => ({
+                        ...prev,
+                        answer: e.target.value,
+                      }))
+                    }
+                  />
+                </CardContent>
+                <CardFooter className="flex flex-row justify-center">
+                  <Button className="text-xl" onClick={handleCreateFlashCard}>
+                    Add
+                  </Button>
+                </CardFooter>
+              </Card>
+      
+              <div className="m-10 flex flex-col items-center">
+                <h2 className="text-xl font-bold mb-4">FlashCards</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {newDeck.flashcards.map((flashcard) => (
+                    <FlashCard
+                      key={flashcard._id}
+                      fid={flashcard._id}
+                      question={flashcard.question}
+                      answer={flashcard.answer}
+                    />
+                  ))}
                 </div>
-
-            </div>
-        )
-    }
+              </div>
+            </>
+          )}
+        </div>
+      );
+      
 }
-export default CreateDeck
+
+export default CreateDeck;

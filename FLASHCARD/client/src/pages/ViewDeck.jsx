@@ -1,38 +1,34 @@
 import React,{useState,useEffect} from 'react'
 import FlashCard from '../components/custom/FlashCard'
 import { useParams } from 'react-router-dom';
-
+import axios from 'axios';
 function ViewDeck() {
     let [decks,setDecks]=useState([]);
     let [flashcards,setFlashcards]=useState([]);
 
     let {DeckId}=useParams();
-    let id=Number(DeckId);
-    useEffect(()=>{
-            
-            const storedDecks=localStorage.getItem('decks');
-            console.log(storedDecks)
-            if(storedDecks){
-
-                setDecks(JSON.parse(storedDecks));
-            }else {
-                fetch("/decks.json")
-                  .then((res) => res.json())
-                  .then((data) => {
-                    
-                    setDecks(data);
-                    localStorage.setItem("decks", JSON.stringify(data)); // Save initially
-                  })
-                  .catch((error) => console.error("Error loading decks:", error));
-              }
-        },[])
+    
+    
+    useEffect(() => {
+        const fetchDecks = async () => {
+          try {
+            const response = await axios.get('http://localhost:3000/decks');
+            setDecks(response.data);
+          } catch (err) {
+            console.error('Failed to load decks:', err);
+          }
+        };
+    
+        fetchDecks();
+      }, []);
+    
     
     useEffect(()=>{
         if (decks.length > 0) { 
-            let deck=decks.find((deck)=>deck.id===id);
-            setFlashcards(deck.flashcards);
+            let deck=decks.find((deck)=>deck._id===DeckId);
+            setFlashcards(deck.flashCards);
         }
-    },[decks,id])
+    },[decks,DeckId])
     
   return (
     <div className='m-10 flex flex-col items-center' >

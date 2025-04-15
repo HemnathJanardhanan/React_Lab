@@ -35,9 +35,6 @@ function HomePage() {
     fetchEvents();
   },[])
 
-  useEffect(()=>{
-    console.log(list)
-  },[list])
 
   const addItemHandler=async()=>{
     const obj={name:itemName,quantity:qty,isChecked:false}

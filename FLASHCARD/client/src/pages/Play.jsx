@@ -2,35 +2,30 @@ import React, { useState, useEffect } from "react";
 import PlayCard from "../components/custom/PlayCard";
 import { useParams } from "react-router-dom";
 import { Button } from "../components/ui/button";
+import axios from "axios";
+
 function Play() {
-  const [decks, setDecks] = useState([]);
+  
   const [flashcards, setFlashcards] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const { DeckId } = useParams();
-  const id = Number(DeckId);
+  
 
   useEffect(() => {
-    const storedDecks = localStorage.getItem("decks");
-    if (storedDecks) {
-      setDecks(JSON.parse(storedDecks));
-    } else {
-      fetch("/decks.json")
-        .then((res) => res.json())
-        .then((data) => {
-          setDecks(data);
-          localStorage.setItem("decks", JSON.stringify(data));
-        })
-        .catch((error) => console.error("Error loading decks:", error));
-    }
+    const fetchDecks = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/deck/${DeckId}/play`);
+        setFlashcards(response.data);
+      } catch (err) {
+        console.error('Failed to load decks:', err);
+      }
+    };
+
+    fetchDecks();
   }, []);
 
-  useEffect(() => {
-    if (decks.length > 0) {
-      const deck = decks.find((deck) => deck.id === id);
-      setFlashcards(deck?.flashcards || []); 
-    }
-  }, [decks, id]);
+ 
 
   
   const handleNext = () => {
