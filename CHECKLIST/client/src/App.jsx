@@ -2,7 +2,7 @@ import './App.css'
 import Header from './components/custom/Header'
 import HomePage from './pages/HomePage'
 import {Routes,Route} from 'react-router-dom'
-
+import React from 'react';
 
 
 function App() {
